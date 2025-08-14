@@ -42,7 +42,7 @@ def PvP_start():
 
     #canvas.create_oval(CELL_SIZE, CELL_SIZE, 0, 0, fill="RED",) note for me
 
-    def REDraw():
+    def ReDraw():
         for i in range(COLUMNS):
             canvas.create_line((CELL_SIZE*i), (ROWS*CELL_SIZE), (CELL_SIZE*i), 0, fill="black", width=3)
         for i in range(ROWS):
@@ -60,16 +60,18 @@ def PvP_start():
             if board[row][column] == 0:
                 board[row][column] = player
                 break
-        REDraw()
+        ReDraw()
         global turns
         turns += 1
         playchange()
 
-    drop0 = Button(frame2, text="drop", command=lambda: drop(0))
-    drop0.pack()
-    
-    
-    REDraw()
+    buttons = []
+    for column in range(COLUMNS):
+        btn = Button(frame2, text="drop", command=lambda c=column: drop(c))
+        btn.place(x=(80+(column*CELL_SIZE)),y=5)
+        buttons.append(btn)
+
+    ReDraw()
     PvPWin.mainloop()
 
 
