@@ -60,6 +60,8 @@ def PvP_start():
             if board[row][column] == 0:
                 board[row][column] = player
                 break
+        else:
+            return None
         ReDraw()
         global turns
         turns += 1
