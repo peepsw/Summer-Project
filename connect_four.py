@@ -51,12 +51,8 @@ def PvP_start():
     def drop(column):
         for row in range(6):
             if board[row][column] == 0:
-                if player == Red:
-                    board[row][column] = Red
-                    break
-                elif player == Yellow:
-                    board[row][column] = Yellow
-                    break
+                board[row][column] = player
+                break
         redraw()
         global turns
         turns += 1
