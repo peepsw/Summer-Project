@@ -62,13 +62,37 @@ def PvP_start():
             for row in range(ROWS):
                 if board[row][column] == player:
                     for i in range(WIN_LENGTH):
-                        if row+(WIN_LENGTH) > ROWS:
+                        if row+WIN_LENGTH > ROWS:
                             break
-                        if board[row+i][(column)] != player:
+                        if board[row+i][column] != player:
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                print("win")               
+                                print("win")
+                    for i in range(WIN_LENGTH):
+                        if column+WIN_LENGTH > COLUMNS:
+                            break
+                        if board[row][column+i] != player:
+                            break
+                        else:
+                            if i == (WIN_LENGTH-1):
+                                print("win")
+                    for i in range(WIN_LENGTH):
+                        if row+WIN_LENGTH > ROWS or column+WIN_LENGTH > COLUMNS:
+                            break
+                        if board[row+i][column+i] != player:
+                            break
+                        else:
+                            if i == (WIN_LENGTH-1):
+                                print("win")
+                    for i in range(WIN_LENGTH):
+                        if row+WIN_LENGTH > ROWS or  column-i < 0:
+                            break
+                        if board[row+i][column-i] != player:
+                            break
+                        else:
+                            if i == (WIN_LENGTH-1):
+                                print("win")            
     def drop(column):
         for row in range(ROWS):
             if board[row][column] == 0:
