@@ -8,6 +8,7 @@ RED = 2
 ROWS = 6
 COLUMNS = 7
 CELL_SIZE = 100
+WIN_LENGTH = 4
 
 global turns
 turns = 0
@@ -54,7 +55,20 @@ def PvP_start():
                     canvas.create_oval(column*CELL_SIZE, (ROWS-row)*CELL_SIZE, (column+1)*CELL_SIZE, ((ROWS-1)-row)*CELL_SIZE, fill="RED",)
                 elif board[row][column] == YELLOW:
                     canvas.create_oval(column*CELL_SIZE, (ROWS-row)*CELL_SIZE, (column+1)*CELL_SIZE, ((ROWS-1)-row)*CELL_SIZE, fill="YELLOW",)
-                    
+
+
+    def RunCheck():
+        for column in range(COLUMNS):
+            for row in range(ROWS):
+                if board[row][column] == player:
+                    for i in range(WIN_LENGTH):
+                        if row+(WIN_LENGTH) > ROWS:
+                            break
+                        if board[row+i][(column)] != player:
+                            break
+                        else:
+                            if i == (WIN_LENGTH-1):
+                                print("win")               
     def drop(column):
         for row in range(ROWS):
             if board[row][column] == 0:
@@ -62,6 +76,7 @@ def PvP_start():
                 break
         else:
             return None
+        RunCheck()
         ReDraw()
         global turns
         turns += 1
