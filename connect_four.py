@@ -1,6 +1,7 @@
 from tkinter import *
 import tkinter as tk
 
+EMPTY = 0
 YELLOW = 1
 RED = 2
 #setting the value for the disc colour, for use in the board
@@ -10,17 +11,10 @@ COLUMNS = 7
 CELL_SIZE = 100
 WIN_LENGTH = 4
 
-global turns
 turns = 0
+player = EMPTY
+board = []
 
-def playchange():
-    global player
-    if turns%2 == 0:
-        player = YELLOW
-    elif turns%2 == 1:
-        player = RED
-playchange()
-board = [[0 for i in range(COLUMNS)] for i in range(ROWS)]
 
 
 
@@ -41,9 +35,49 @@ def PvP_start():
     canvas = tk.Canvas(PvPWin, width=(COLUMNS*CELL_SIZE), height=(ROWS*CELL_SIZE), bg="white")
     canvas.place(relx=0.5, rely=0.45, anchor="center")
 
+    buttons = []
+    for column in range(COLUMNS):
+        btn = Button(frame2, text="drop", command=lambda c=column: drop(c))
+        btn.place(x=(80+(column*CELL_SIZE)),y=5)
+        buttons.append(btn)
+    
+    reset_btn = Button(frame2, text="Reset", width=8, height=2 ,command=lambda: ResetGame())
+    reset_btn.place(x=((COLUMNS*CELL_SIZE)),y=(80+(ROWS*CELL_SIZE)))
+    
 
+
+    def NextPlayer():
+        global turns
+        turns += 1
+
+        global player
+        if turns%2 == 0:
+            player = YELLOW
+        elif turns%2 == 1:
+            player = RED
+
+    def ResetGame():
+        global board
+        board = [[EMPTY for i in range(COLUMNS)] for i in range(ROWS)]
+
+        global turns
+        turns = 0
+
+        global player
+        player = YELLOW #Yellow always starts
+        
+        ReDraw()
+
+
+
+    def Winner():
+        print(player, "Wins!")
+        for i in range(COLUMNS):
+            buttons[i].config(state=DISABLED)
 
     def ReDraw():
+        canvas.delete("all")
+
         for i in range(COLUMNS):
             canvas.create_line((CELL_SIZE*i), (ROWS*CELL_SIZE), (CELL_SIZE*i), 0, fill="black", width=3)
         for i in range(ROWS):
@@ -56,10 +90,7 @@ def PvP_start():
                 elif board[row][column] == YELLOW:
                     canvas.create_oval(column*CELL_SIZE, (ROWS-row)*CELL_SIZE, (column+1)*CELL_SIZE, ((ROWS-1)-row)*CELL_SIZE, fill="YELLOW",)
 
-    def Winner():
-        print(player, "Wins!")
-        for i in range(COLUMNS):
-            buttons[i].config(state=DISABLED)
+
 
 
     def RunCheck():
@@ -111,17 +142,12 @@ def PvP_start():
                 break
         RunCheck()
         ReDraw()
-        global turns
-        turns += 1
-        playchange()
+        NextPlayer()
 
-    buttons = []
-    for column in range(COLUMNS):
-        btn = Button(frame2, text="drop", command=lambda c=column: drop(c))
-        btn.place(x=(80+(column*CELL_SIZE)),y=5)
-        buttons.append(btn)
 
-    ReDraw()
+
+    # start things off
+    ResetGame()
     PvPWin.mainloop()
 
 
