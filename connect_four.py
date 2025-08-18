@@ -41,7 +41,7 @@ def PvP_start():
     canvas = tk.Canvas(PvPWin, width=(COLUMNS*CELL_SIZE), height=(ROWS*CELL_SIZE), bg="white")
     canvas.place(relx=0.5, rely=0.45, anchor="center")
 
-    #canvas.create_oval(CELL_SIZE, CELL_SIZE, 0, 0, fill="RED",) note for me
+
 
     def ReDraw():
         for i in range(COLUMNS):
@@ -56,6 +56,11 @@ def PvP_start():
                 elif board[row][column] == YELLOW:
                     canvas.create_oval(column*CELL_SIZE, (ROWS-row)*CELL_SIZE, (column+1)*CELL_SIZE, ((ROWS-1)-row)*CELL_SIZE, fill="YELLOW",)
 
+    def Winner():
+        print(player, "Wins!")
+        for i in range(COLUMNS):
+            buttons[i].config(state=DISABLED)
+
 
     def RunCheck():
         for column in range(COLUMNS):
@@ -68,7 +73,8 @@ def PvP_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                print("win")
+                                Winner()
+                                return None
                     for i in range(WIN_LENGTH):
                         if column+WIN_LENGTH > COLUMNS:
                             break
@@ -76,7 +82,8 @@ def PvP_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                print("win")
+                                Winner()
+                                return None
                     for i in range(WIN_LENGTH):
                         if row+WIN_LENGTH > ROWS or column+WIN_LENGTH > COLUMNS:
                             break
@@ -84,7 +91,8 @@ def PvP_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                print("win")
+                                Winner()
+                                return None
                     for i in range(WIN_LENGTH):
                         if row+WIN_LENGTH > ROWS or  column-i < 0:
                             break
@@ -92,14 +100,15 @@ def PvP_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                print("win")            
+                                Winner()
+                                return None            
     def drop(column):
         for row in range(ROWS):
             if board[row][column] == 0:
                 board[row][column] = player
+                if row == ROWS-1:
+                    buttons[column].config(state=DISABLED)
                 break
-        else:
-            return None
         RunCheck()
         ReDraw()
         global turns
