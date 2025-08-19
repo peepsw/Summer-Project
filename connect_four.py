@@ -6,10 +6,19 @@ YELLOW = 1
 RED = 2
 #setting the value for the disc colour, for use in the board
 
+
 ROWS = 6
 COLUMNS = 7
 CELL_SIZE = 100
 WIN_LENGTH = 4
+
+BACKGROUND = "light blue"
+GUTTER = 50
+HUD_WIDTH = 300
+HUD_LEFT = (COLUMNS*CELL_SIZE)+(2*GUTTER)
+HUD_RIGHT = (HUD_LEFT+HUD_WIDTH)
+HUD_FONT = ("Arial", 18, "bold")
+HUD_SPACER = 35
 
 turns = 0
 player = EMPTY
@@ -21,30 +30,58 @@ board = []
 def PvP_start():
     navigationMenuWin.destroy()
 
-    window_width = (COLUMNS*CELL_SIZE)+100
-    window_height = (ROWS*CELL_SIZE)+150
+    window_width = (COLUMNS*CELL_SIZE)+(3*GUTTER)+HUD_WIDTH
+    window_height = (ROWS*CELL_SIZE)+(2*GUTTER)
 
     PvPWin = Tk()
     PvPWin.title("Connect Four PvP")
     PvPWin.geometry(str(window_width)+"x"+str(window_height))
-    PvPWin.configure(background="light blue")
+    PvPWin.configure(background=BACKGROUND)
 
     frame2 = Frame(PvPWin).pack()
     
-
-    canvas = tk.Canvas(PvPWin, width=(COLUMNS*CELL_SIZE), height=(ROWS*CELL_SIZE), bg="white")
-    canvas.place(relx=0.5, rely=0.45, anchor="center")
+    board_canvas = tk.Canvas(PvPWin, width=(COLUMNS*CELL_SIZE), height=(ROWS*CELL_SIZE), bg="white", highlightthickness=0)
+    board_canvas.place(x=GUTTER, y=GUTTER)
 
     buttons = []
     for column in range(COLUMNS):
         btn = Button(frame2, text="drop", command=lambda c=column: drop(c))
-        btn.place(x=(80+(column*CELL_SIZE)),y=5)
+        btn.place(x=(80+(column*CELL_SIZE)),y=15)
         buttons.append(btn)
+    
+    
+    # HUD
+
+    next_player_label = tk.Label(frame2, text="Next Player:", font=HUD_FONT, bg=BACKGROUND).place(x=HUD_LEFT, y=GUTTER+HUD_SPACER)
+    next_player_canvas = tk.Canvas(PvPWin, width=CELL_SIZE, height=CELL_SIZE, bg=BACKGROUND, bd = 0, highlightthickness=0)
+    next_player_canvas.place(x=HUD_RIGHT-CELL_SIZE, y=GUTTER)
+    
+    
+    
     
     reset_btn = Button(frame2, text="Reset", width=8, height=2 ,command=lambda: ResetGame())
     reset_btn.place(x=((COLUMNS*CELL_SIZE)),y=(80+(ROWS*CELL_SIZE)))
     
+    def GetPlayerColour(player):
+        if player == YELLOW:
+            return "yellow"
+        elif player == RED:
+            return "red"
+        else:
+            return "white"
 
+
+
+    def DrawDisk(canvas, player, row, column, scale=0.8):
+        gap = ((1-scale)*CELL_SIZE*0.5)
+        canvas.create_oval(
+            (column*CELL_SIZE)+gap, 
+            (((ROWS-1)-row)*CELL_SIZE)+gap,
+            ((column+1)*CELL_SIZE)-gap, 
+            ((ROWS-row)*CELL_SIZE)-gap,  
+            fill=GetPlayerColour(player), 
+        )
+        
 
     def NextPlayer():
         global turns
@@ -71,30 +108,26 @@ def PvP_start():
         
         ReDraw()
 
-
-
     def Winner():
         print(player, "Wins!")
         for i in range(COLUMNS):
             buttons[i].config(state=DISABLED)
 
     def ReDraw():
-        canvas.delete("all")
+        board_canvas.delete("all")
 
-        for i in range(COLUMNS):
-            canvas.create_line((CELL_SIZE*i), (ROWS*CELL_SIZE), (CELL_SIZE*i), 0, fill="black", width=3)
-        for i in range(ROWS):
-            canvas.create_line((COLUMNS*CELL_SIZE), (CELL_SIZE*i), 0, (CELL_SIZE*i), fill="black", width=3)
+        for i in range(COLUMNS+1):
+            board_canvas.create_line((CELL_SIZE*i), (ROWS*CELL_SIZE), (CELL_SIZE*i), 0, fill="black", width=2)
+        for i in range(ROWS+1):
+            board_canvas.create_line((COLUMNS*CELL_SIZE), (CELL_SIZE*i), 0, (CELL_SIZE*i), fill="black", width=2)
         
         for column in range(COLUMNS):
             for row in range(ROWS):
-                if board[row][column] == RED:
-                    canvas.create_oval(column*CELL_SIZE, (ROWS-row)*CELL_SIZE, (column+1)*CELL_SIZE, ((ROWS-1)-row)*CELL_SIZE, fill="RED",)
-                elif board[row][column] == YELLOW:
-                    canvas.create_oval(column*CELL_SIZE, (ROWS-row)*CELL_SIZE, (column+1)*CELL_SIZE, ((ROWS-1)-row)*CELL_SIZE, fill="YELLOW",)
-
-
-
+                if board[row][column] != EMPTY:
+                    DrawDisk(board_canvas, board[row][column], row, column)
+        
+        next_player_canvas.delete("all")
+        DrawDisk(next_player_canvas, player, ROWS-1, 0, 0.6)
 
     def RunCheck():
         for column in range(COLUMNS):
@@ -144,9 +177,8 @@ def PvP_start():
                     buttons[column].config(state=DISABLED)
                 break
         RunCheck()
-        ReDraw()
         NextPlayer()
-
+        ReDraw()
 
 
     # start things off
@@ -158,7 +190,7 @@ def PvP_start():
 navigationMenuWin = Tk()
 navigationMenuWin.title("Connect Four Navigation")
 navigationMenuWin.geometry("400x650")
-navigationMenuWin.configure(background="light blue")
+navigationMenuWin.configure(background=BACKGROUND)
 
 frame1 = Frame(navigationMenuWin).pack()
 
