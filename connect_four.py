@@ -65,6 +65,9 @@ def PvP_start():
 
         global player
         player = YELLOW #Yellow always starts
+
+        for i in range(COLUMNS):
+            buttons[i].config(state=NORMAL)
         
         ReDraw()
 
