@@ -27,7 +27,7 @@ board = []
 
 
 
-def PvP_start():
+def pvp_start():
     navigationMenuWin.destroy()
 
     window_width = (COLUMNS*CELL_SIZE)+(3*GUTTER)+HUD_WIDTH
@@ -45,7 +45,7 @@ def PvP_start():
 
     buttons = []
     for column in range(COLUMNS):
-        btn = Button(frame2, text="drop", command=lambda c=column: drop(c))
+        btn = Button(frame2, text="drop", command=lambda c=column: drop_disk(c))
         btn.place(x=(80+(column*CELL_SIZE)),y=15)
         buttons.append(btn)
     
@@ -59,10 +59,10 @@ def PvP_start():
     
     
     
-    reset_btn = Button(frame2, text="Reset", width=8, height=2 ,command=lambda: ResetGame())
+    reset_btn = Button(frame2, text="Reset", width=8, height=2 ,command=lambda: reset_game())
     reset_btn.place(x=((COLUMNS*CELL_SIZE)),y=(80+(ROWS*CELL_SIZE)))
     
-    def GetPlayerColour(player):
+    def get_player_colour(player):
         if player == YELLOW:
             return "yellow"
         elif player == RED:
@@ -72,18 +72,18 @@ def PvP_start():
 
 
 
-    def DrawDisk(canvas, player, row, column, scale=0.8):
+    def draw_disk(canvas, player, row, column, scale=0.8):
         gap = ((1-scale)*CELL_SIZE*0.5)
         canvas.create_oval(
             (column*CELL_SIZE)+gap, 
             (((ROWS-1)-row)*CELL_SIZE)+gap,
             ((column+1)*CELL_SIZE)-gap, 
             ((ROWS-row)*CELL_SIZE)-gap,  
-            fill=GetPlayerColour(player), 
+            fill=get_player_colour(player), 
         )
         
 
-    def NextPlayer():
+    def next_turn():
         global turns
         turns += 1
 
@@ -93,7 +93,7 @@ def PvP_start():
         elif turns%2 == 1:
             player = RED
 
-    def ResetGame():
+    def reset_game():
         global board
         board = [[EMPTY for i in range(COLUMNS)] for i in range(ROWS)]
 
@@ -106,14 +106,14 @@ def PvP_start():
         for i in range(COLUMNS):
             buttons[i].config(state=NORMAL)
         
-        ReDraw()
+        render_game()
 
-    def Winner():
+    def declare_winner():
         print(player, "Wins!")
         for i in range(COLUMNS):
             buttons[i].config(state=DISABLED)
 
-    def ReDraw():
+    def render_game():
         board_canvas.delete("all")
 
         for i in range(COLUMNS+1):
@@ -124,12 +124,12 @@ def PvP_start():
         for column in range(COLUMNS):
             for row in range(ROWS):
                 if board[row][column] != EMPTY:
-                    DrawDisk(board_canvas, board[row][column], row, column)
+                    draw_disk(board_canvas, board[row][column], row, column)
         
         next_player_canvas.delete("all")
-        DrawDisk(next_player_canvas, player, ROWS-1, 0, 0.6)
+        draw_disk(next_player_canvas, player, ROWS-1, 0, 0.6)
 
-    def RunCheck():
+    def check_winner():
         for column in range(COLUMNS):
             for row in range(ROWS):
                 if board[row][column] == player:
@@ -140,7 +140,7 @@ def PvP_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                Winner()
+                                declare_winner()
                                 return None
                     for i in range(WIN_LENGTH):
                         if column+WIN_LENGTH > COLUMNS:
@@ -149,7 +149,7 @@ def PvP_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                Winner()
+                                declare_winner()
                                 return None
                     for i in range(WIN_LENGTH):
                         if row+WIN_LENGTH > ROWS or column+WIN_LENGTH > COLUMNS:
@@ -158,7 +158,7 @@ def PvP_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                Winner()
+                                declare_winner()
                                 return None
                     for i in range(WIN_LENGTH):
                         if row+WIN_LENGTH > ROWS or  column-i < 0:
@@ -167,22 +167,22 @@ def PvP_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                Winner()
+                                declare_winner()
                                 return None            
-    def drop(column):
+    def drop_disk(column):
         for row in range(ROWS):
             if board[row][column] == 0:
                 board[row][column] = player
                 if row == ROWS-1:
                     buttons[column].config(state=DISABLED)
                 break
-        RunCheck()
-        NextPlayer()
-        ReDraw()
+        check_winner()
+        next_turn()
+        render_game()
 
 
     # start things off
-    ResetGame()
+    reset_game()
     PvPWin.mainloop()
 
 
@@ -194,7 +194,7 @@ navigationMenuWin.configure(background=BACKGROUND)
 
 frame1 = Frame(navigationMenuWin).pack()
 
-b1 = Button(frame1, text="Player VS Player", font=("Arial", 28),command=PvP_start).pack()
+b1 = Button(frame1, text="Player VS Player", font=("Arial", 28),command=pvp_start).pack()
 
 
 
