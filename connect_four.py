@@ -56,8 +56,10 @@ def pvp_start():
     next_player_canvas = tk.Canvas(PvPWin, width=CELL_SIZE, height=CELL_SIZE, bg=BACKGROUND, bd = 0, highlightthickness=0)
     next_player_canvas.place(x=HUD_RIGHT-CELL_SIZE, y=GUTTER)
     
-    
-    
+    turns_taken_label = tk.Label(frame2, text="Turns taken:", font=HUD_FONT, bg=BACKGROUND).place(x=HUD_LEFT, y=GUTTER+HUD_SPACER+CELL_SIZE)
+
+    turns_text = StringVar(frame2, "")
+    turns_taken_counter = tk.Label(frame2, textvariable=turns_text, font=HUD_FONT, bg=BACKGROUND, anchor="e", width=4).place(x=HUD_RIGHT-CELL_SIZE, y=GUTTER+HUD_SPACER+CELL_SIZE)
     
     reset_btn = Button(frame2, text="Reset", width=8, height=2 ,command=lambda: reset_game())
     reset_btn.place(x=((COLUMNS*CELL_SIZE)),y=(80+(ROWS*CELL_SIZE)))
@@ -86,6 +88,7 @@ def pvp_start():
     def next_turn():
         global turns
         turns += 1
+        turns_text.set(str(turns))
 
         global player
         if turns%2 == 0:
@@ -99,6 +102,7 @@ def pvp_start():
 
         global turns
         turns = 0
+        turns_text.set(str(turns))
 
         global player
         player = YELLOW #Yellow always starts
@@ -128,6 +132,8 @@ def pvp_start():
         
         next_player_canvas.delete("all")
         draw_disk(next_player_canvas, player, ROWS-1, 0, 0.6)
+
+        turns_taken_counter
 
     def check_winner():
         for column in range(COLUMNS):
