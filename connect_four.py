@@ -12,10 +12,12 @@ COLUMNS = 7
 CELL_SIZE = 100
 WIN_LENGTH = 4
 
+BOARD_BACKGROUND = "blue"
 BACKGROUND = "light blue"
 GUTTER = 50
+BOARD_BORDER = 15
 HUD_WIDTH = 300
-HUD_LEFT = (COLUMNS*CELL_SIZE)+(2*GUTTER)
+HUD_LEFT = (COLUMNS*CELL_SIZE)+(2*GUTTER)+(2*BOARD_BORDER)
 HUD_RIGHT = (HUD_LEFT+HUD_WIDTH)
 HUD_FONT = ("Arial", 18, "bold")
 HUD_SPACER = 35
@@ -30,8 +32,8 @@ board = []
 def pvp_start():
     navigationMenuWin.destroy()
 
-    window_width = (COLUMNS*CELL_SIZE)+(3*GUTTER)+HUD_WIDTH
-    window_height = (ROWS*CELL_SIZE)+(2*GUTTER)
+    window_width = (COLUMNS*CELL_SIZE)+(3*GUTTER)+HUD_WIDTH+(2*BOARD_BORDER)
+    window_height = (ROWS*CELL_SIZE)+(2*GUTTER)+(2*BOARD_BORDER)
 
     PvPWin = Tk()
     PvPWin.title("Connect Four PvP")
@@ -39,14 +41,17 @@ def pvp_start():
     PvPWin.configure(background=BACKGROUND)
 
     frame2 = Frame(PvPWin).pack()
-    
-    board_canvas = tk.Canvas(PvPWin, width=(COLUMNS*CELL_SIZE), height=(ROWS*CELL_SIZE), bg="white", highlightthickness=0)
-    board_canvas.place(x=GUTTER, y=GUTTER)
+
+    border_canvas = tk.Canvas(PvPWin, width=(COLUMNS*CELL_SIZE)+(2*BOARD_BORDER), height=(ROWS*CELL_SIZE)+(2*BOARD_BORDER), bg=BOARD_BACKGROUND, highlightthickness=0)
+    border_canvas.place(x=GUTTER, y=GUTTER)
+
+    board_canvas = tk.Canvas(PvPWin, width=(COLUMNS*CELL_SIZE), height=(ROWS*CELL_SIZE), bg=BOARD_BACKGROUND, highlightthickness=0)
+    board_canvas.place(x=GUTTER+BOARD_BORDER, y=GUTTER+BOARD_BORDER)
 
     buttons = []
     for column in range(COLUMNS):
         btn = Button(frame2, text="drop", command=lambda c=column: drop_disk(c))
-        btn.place(x=(80+(column*CELL_SIZE)),y=15)
+        btn.place(x=(80+(column*CELL_SIZE)+BOARD_BORDER),y=15)
         buttons.append(btn)
     
     
@@ -70,7 +75,7 @@ def pvp_start():
         elif player == RED:
             return "red"
         else:
-            return "white"
+            return "light blue"
 
 
 
@@ -120,15 +125,9 @@ def pvp_start():
     def render_game():
         board_canvas.delete("all")
 
-        for i in range(COLUMNS+1):
-            board_canvas.create_line((CELL_SIZE*i), (ROWS*CELL_SIZE), (CELL_SIZE*i), 0, fill="black", width=2)
-        for i in range(ROWS+1):
-            board_canvas.create_line((COLUMNS*CELL_SIZE), (CELL_SIZE*i), 0, (CELL_SIZE*i), fill="black", width=2)
-        
         for column in range(COLUMNS):
             for row in range(ROWS):
-                if board[row][column] != EMPTY:
-                    draw_disk(board_canvas, board[row][column], row, column)
+                draw_disk(board_canvas, board[row][column], row, column)
         
         next_player_canvas.delete("all")
         draw_disk(next_player_canvas, player, ROWS-1, 0, 0.6)
