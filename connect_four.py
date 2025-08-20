@@ -16,6 +16,7 @@ BOARD_BACKGROUND = "blue"
 BACKGROUND = "light blue"
 GUTTER = 50
 BOARD_BORDER = 15
+BUTTON_FONT = ("Arial", 10, "bold")
 HUD_WIDTH = 300
 HUD_LEFT = (COLUMNS*CELL_SIZE)+(2*GUTTER)+(2*BOARD_BORDER)
 HUD_RIGHT = (HUD_LEFT+HUD_WIDTH)
@@ -50,8 +51,9 @@ def pvp_start():
 
     buttons = []
     for column in range(COLUMNS):
-        btn = Button(frame2, text="drop", command=lambda c=column: drop_disk(c))
-        btn.place(x=(80+(column*CELL_SIZE)+BOARD_BORDER),y=15)
+        btn = Button(frame2, text="Drop", command=lambda c=column: drop_disk(c))
+        btn.config(width=8,font=BUTTON_FONT)
+        btn.place(x=(66+(column*CELL_SIZE)+BOARD_BORDER),y=15)
         buttons.append(btn)
     
     
@@ -66,8 +68,8 @@ def pvp_start():
     turns_text = StringVar(frame2, "")
     turns_taken_counter = tk.Label(frame2, textvariable=turns_text, font=HUD_FONT, bg=BACKGROUND, anchor="e", width=4).place(x=HUD_RIGHT-CELL_SIZE, y=GUTTER+HUD_SPACER+CELL_SIZE)
     
-    reset_btn = Button(frame2, text="Reset", width=8, height=2 ,command=lambda: reset_game())
-    reset_btn.place(x=((COLUMNS*CELL_SIZE)),y=(80+(ROWS*CELL_SIZE)))
+    reset_btn = Button(frame2, text="Reset", width=10, height=2, font=BUTTON_FONT,command=lambda: reset_game())
+    reset_btn.place(x=HUD_RIGHT-100,y=((ROWS)*CELL_SIZE))
     
     def get_player_colour(player):
         if player == YELLOW:
