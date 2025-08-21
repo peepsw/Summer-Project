@@ -26,6 +26,12 @@ HUD_SPACER = 35
 turns = 0
 player = EMPTY
 board = []
+winning_pos = {
+    'start_row': -1,
+    'start_column': -1,
+    'end_row': -1,
+    'end_column': -1 
+}
 
 
 
@@ -72,12 +78,14 @@ def pvp_start():
     reset_btn.place(x=HUD_RIGHT-100,y=((ROWS)*CELL_SIZE))
     
     def get_player_colour(player):
+        if player == EMPTY:
+            return BACKGROUND
         if player == YELLOW:
             return "yellow"
         elif player == RED:
             return "red"
         else:
-            return "light blue"
+            return "black"
 
 
 
@@ -104,6 +112,11 @@ def pvp_start():
             player = RED
 
     def reset_game():
+        winning_pos["start_row"] = -1
+        winning_pos["start_column"] = -1
+        winning_pos["end_row"] = -1
+        winning_pos["end_column"] = -1
+
         global board
         board = [[EMPTY for i in range(COLUMNS)] for i in range(ROWS)]
 
@@ -120,7 +133,12 @@ def pvp_start():
         
         render_game()
 
-    def declare_winner():
+    def declare_winner(start_row, start_column, end_row, end_column):
+        winning_pos["start_row"] = start_row
+        winning_pos["start_column"] = start_column
+        winning_pos["end_row"] = end_row
+        winning_pos["end_column"] = end_column 
+
         current_player_var.set("Winner!")
         for i in range(COLUMNS):
             buttons[i].config(state=DISABLED)
@@ -135,7 +153,18 @@ def pvp_start():
         current_player_canvas.delete("all")
         draw_disk(current_player_canvas, player, ROWS-1, 0, 0.6)
 
-        turns_taken_counter
+        if winning_pos["start_row"] != -1:
+            board_canvas.create_line(
+                (winning_pos["start_column"] + 0.5) * CELL_SIZE,
+                ((ROWS-winning_pos["start_row"]) - 0.5) * CELL_SIZE,
+                (winning_pos["end_column"] + 0.5) * CELL_SIZE,
+                ((ROWS-winning_pos["end_row"]) - 0.5) * CELL_SIZE,
+                width=4
+            )
+            
+            draw_disk(board_canvas, -1, winning_pos["start_row"], winning_pos["start_column"], 0.2)
+            draw_disk(board_canvas, -1, winning_pos["end_row"], winning_pos["end_column"], 0.2)
+            
 
     def check_winner():
         for column in range(COLUMNS):
@@ -148,7 +177,7 @@ def pvp_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                declare_winner()
+                                declare_winner(row, column, (row+i), column)
                                 return True
                     for i in range(WIN_LENGTH):
                         if column+WIN_LENGTH > COLUMNS:
@@ -157,7 +186,7 @@ def pvp_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                declare_winner()
+                                declare_winner(row, column, row, (column+i))
                                 return True
                     for i in range(WIN_LENGTH):
                         if row+WIN_LENGTH > ROWS or column+WIN_LENGTH > COLUMNS:
@@ -166,7 +195,7 @@ def pvp_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                declare_winner()
+                                declare_winner(row, column, (row+i), (column+i))
                                 return True
                     for i in range(WIN_LENGTH):
                         if row+WIN_LENGTH > ROWS or  column-i < 0:
@@ -175,7 +204,7 @@ def pvp_start():
                             break
                         else:
                             if i == (WIN_LENGTH-1):
-                                declare_winner()
+                                declare_winner(row, column, (row+i), (column-i))
                                 return True
         return False # default return value
 
