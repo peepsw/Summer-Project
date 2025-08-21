@@ -58,15 +58,15 @@ def pvp_start():
     
     
     # HUD
-
-    next_player_label = tk.Label(frame2, text="Next Player:", font=HUD_FONT, bg=BACKGROUND).place(x=HUD_LEFT, y=GUTTER+HUD_SPACER)
-    next_player_canvas = tk.Canvas(PvPWin, width=CELL_SIZE, height=CELL_SIZE, bg=BACKGROUND, bd = 0, highlightthickness=0)
-    next_player_canvas.place(x=HUD_RIGHT-CELL_SIZE, y=GUTTER)
+    current_player_var = StringVar(frame2, "")
+    current_player_label = tk.Label(frame2, textvariable=current_player_var, font=HUD_FONT, bg=BACKGROUND).place(x=HUD_LEFT, y=GUTTER+HUD_SPACER)
+    current_player_canvas = tk.Canvas(PvPWin, width=CELL_SIZE, height=CELL_SIZE, bg=BACKGROUND, bd = 0, highlightthickness=0)
+    current_player_canvas.place(x=HUD_RIGHT-CELL_SIZE, y=GUTTER)
     
     turns_taken_label = tk.Label(frame2, text="Turns taken:", font=HUD_FONT, bg=BACKGROUND).place(x=HUD_LEFT, y=GUTTER+HUD_SPACER+CELL_SIZE)
 
-    turns_text = StringVar(frame2, "")
-    turns_taken_counter = tk.Label(frame2, textvariable=turns_text, font=HUD_FONT, bg=BACKGROUND, anchor="e", width=4).place(x=HUD_RIGHT-CELL_SIZE, y=GUTTER+HUD_SPACER+CELL_SIZE)
+    turns_var = StringVar(frame2, "")
+    turns_taken_counter = tk.Label(frame2, textvariable=turns_var, font=HUD_FONT, bg=BACKGROUND, anchor="e", width=4).place(x=HUD_RIGHT-CELL_SIZE, y=GUTTER+HUD_SPACER+CELL_SIZE)
     
     reset_btn = Button(frame2, text="Reset", width=10, height=2, font=BUTTON_FONT,command=lambda: reset_game())
     reset_btn.place(x=HUD_RIGHT-100,y=((ROWS)*CELL_SIZE))
@@ -95,7 +95,7 @@ def pvp_start():
     def next_turn():
         global turns
         turns += 1
-        turns_text.set(str(turns))
+        turns_var.set(str(turns))
 
         global player
         if turns%2 == 0:
@@ -109,10 +109,11 @@ def pvp_start():
 
         global turns
         turns = 0
-        turns_text.set(str(turns))
+        turns_var.set(str(turns))
 
         global player
         player = YELLOW #Yellow always starts
+        current_player_var.set("Next Player:")
 
         for i in range(COLUMNS):
             buttons[i].config(state=NORMAL)
@@ -120,7 +121,7 @@ def pvp_start():
         render_game()
 
     def declare_winner():
-        print(player, "Wins!")
+        current_player_var.set("Winner!")
         for i in range(COLUMNS):
             buttons[i].config(state=DISABLED)
 
@@ -131,8 +132,8 @@ def pvp_start():
             for row in range(ROWS):
                 draw_disk(board_canvas, board[row][column], row, column)
         
-        next_player_canvas.delete("all")
-        draw_disk(next_player_canvas, player, ROWS-1, 0, 0.6)
+        current_player_canvas.delete("all")
+        draw_disk(current_player_canvas, player, ROWS-1, 0, 0.6)
 
         turns_taken_counter
 
@@ -148,7 +149,7 @@ def pvp_start():
                         else:
                             if i == (WIN_LENGTH-1):
                                 declare_winner()
-                                return None
+                                return True
                     for i in range(WIN_LENGTH):
                         if column+WIN_LENGTH > COLUMNS:
                             break
@@ -157,7 +158,7 @@ def pvp_start():
                         else:
                             if i == (WIN_LENGTH-1):
                                 declare_winner()
-                                return None
+                                return True
                     for i in range(WIN_LENGTH):
                         if row+WIN_LENGTH > ROWS or column+WIN_LENGTH > COLUMNS:
                             break
@@ -166,7 +167,7 @@ def pvp_start():
                         else:
                             if i == (WIN_LENGTH-1):
                                 declare_winner()
-                                return None
+                                return True
                     for i in range(WIN_LENGTH):
                         if row+WIN_LENGTH > ROWS or  column-i < 0:
                             break
@@ -175,7 +176,10 @@ def pvp_start():
                         else:
                             if i == (WIN_LENGTH-1):
                                 declare_winner()
-                                return None            
+                                return True
+        return False # default return value
+
+
     def drop_disk(column):
         for row in range(ROWS):
             if board[row][column] == 0:
@@ -183,8 +187,8 @@ def pvp_start():
                 if row == ROWS-1:
                     buttons[column].config(state=DISABLED)
                 break
-        check_winner()
-        next_turn()
+        if check_winner() == False:
+            next_turn()
         render_game()
 
 
