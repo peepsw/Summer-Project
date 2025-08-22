@@ -1,5 +1,11 @@
 from tkinter import *
 import tkinter as tk
+from enum import Enum
+
+class GameState(Enum):
+    PLAYING = 0
+    WON = 1
+    DRAWN = 2
 
 EMPTY = 0
 YELLOW = 1
@@ -32,7 +38,7 @@ winning_pos = {
     'end_row': -1,
     'end_column': -1 
 }
-
+game_state = GameState.PLAYING
 
 
 
@@ -117,6 +123,9 @@ def pvp_start():
         winning_pos["end_row"] = -1
         winning_pos["end_column"] = -1
 
+        global game_state
+        game_state = GameState.PLAYING
+
         global board
         board = [[EMPTY for i in range(COLUMNS)] for i in range(ROWS)]
 
@@ -137,7 +146,10 @@ def pvp_start():
         winning_pos["start_row"] = start_row
         winning_pos["start_column"] = start_column
         winning_pos["end_row"] = end_row
-        winning_pos["end_column"] = end_column 
+        winning_pos["end_column"] = end_column
+
+        global game_state
+        game_state = GameState.WON 
 
         current_player_var.set("Winner!")
         for i in range(COLUMNS):
@@ -153,7 +165,7 @@ def pvp_start():
         current_player_canvas.delete("all")
         draw_disk(current_player_canvas, player, ROWS-1, 0, 0.6)
 
-        if winning_pos["start_row"] != -1:
+        if game_state == GameState.WON:
             board_canvas.create_line(
                 (winning_pos["start_column"] + 0.5) * CELL_SIZE,
                 ((ROWS-winning_pos["start_row"]) - 0.5) * CELL_SIZE,
