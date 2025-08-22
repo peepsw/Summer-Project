@@ -17,6 +17,7 @@ ROWS = 6
 COLUMNS = 7
 CELL_SIZE = 100
 WIN_LENGTH = 4
+MAX_TURNS = ROWS*COLUMNS
 
 BOARD_BACKGROUND = "blue"
 BACKGROUND = "light blue"
@@ -111,6 +112,10 @@ def pvp_start():
         turns += 1
         turns_var.set(str(turns))
 
+        if turns == MAX_TURNS:
+            declare_draw()
+            return None
+        
         global player
         if turns%2 == 0:
             player = YELLOW
@@ -154,6 +159,15 @@ def pvp_start():
         current_player_var.set("Winner!")
         for i in range(COLUMNS):
             buttons[i].config(state=DISABLED)
+
+    def declare_draw():
+        global game_state
+        game_state = GameState.DRAWN
+
+        current_player_var.set("Draw!")
+        global player
+        player = EMPTY
+
 
     def render_game():
         board_canvas.delete("all")
