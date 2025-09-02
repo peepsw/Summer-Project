@@ -1,3 +1,9 @@
+'''
+Connect Four (just pvp for now)
+this code is also available at: 
+https://github.com/peepsw/Summer-Project
+'''
+
 from tkinter import *
 import tkinter as tk
 from enum import Enum
@@ -53,7 +59,7 @@ game_state = GameState.PLAYING # controls the state of the game
 '''
 def pvp_start():
     # closes the initial startup screen
-    navigationMenuWin.destroy() 
+    nav_window.destroy() 
 
     # calculate the window size of the main game window, including HUD
     window_width = (COLUMNS*CELL_SIZE)+(3*GUTTER)+HUD_WIDTH+(2*BOARD_BORDER)
@@ -278,59 +284,108 @@ def pvp_start():
             draw_disc(board_canvas, -1, winning_pos["start_row"], winning_pos["start_column"], 0.2)
             draw_disc(board_canvas, -1, winning_pos["end_row"], winning_pos["end_column"], 0.2)
             
-
+    '''
+        checks the state of the board for any 4 in a rows
+        it loops through each cell in the board
+        it checks horizontially right ,vertically up, diagonally right and diagonally left
+        the others do not need to be checked as they are covered by the way the whole board is checked
+        not the most effecient but through and easy to understand
+    '''
     def check_winner():
+        # loops through every cell
         for column in range(COLUMNS):
             for row in range(ROWS):
+                # only interested in cells containing the current player
                 if board[row][column] == player:
+                    # loops through every cell in the horizontal right, up to winning length
                     for i in range(WIN_LENGTH):
+                        # out of bounds
                         if row+WIN_LENGTH > ROWS:
                             break
+                        # not current player
                         if board[row+i][column] != player:
                             break
+                        # possible run
                         else:
+                            # checks if successfully reached winning length
                             if i == (WIN_LENGTH-1):
+                                # winner! early exit and pass winning coords
                                 declare_winner(row, column, (row+i), column)
                                 return True
+                            
+                    # loops through every cell in the vertically up, up to winning length        
                     for i in range(WIN_LENGTH):
+                        # out of bounds
                         if column+WIN_LENGTH > COLUMNS:
                             break
+                        # not current player
                         if board[row][column+i] != player:
                             break
+                        # possible run
                         else:
+                            # checks if successfully reached winning length
                             if i == (WIN_LENGTH-1):
+                                # winner! early exit and pass winning coords
                                 declare_winner(row, column, row, (column+i))
                                 return True
+                            
+                    # loops through every cell in the diagonally right, up to winning length        
                     for i in range(WIN_LENGTH):
+                        # out of bounds
                         if row+WIN_LENGTH > ROWS or column+WIN_LENGTH > COLUMNS:
                             break
+                        # not current player
                         if board[row+i][column+i] != player:
                             break
+                        # possible run
                         else:
+                            # checks if successfully reached winning length
                             if i == (WIN_LENGTH-1):
+                                # winner! early exit and pass winning coords
                                 declare_winner(row, column, (row+i), (column+i))
                                 return True
+
+                    # loops through every cell in the diagonally right, up to winning length        
                     for i in range(WIN_LENGTH):
+                        # out of bounds
                         if row+WIN_LENGTH > ROWS or  column-i < 0:
                             break
+                        # not current player
                         if board[row+i][column-i] != player:
                             break
+                        # possible run
                         else:
+                            # checks if successfully reached winning length
                             if i == (WIN_LENGTH-1):
+                                # winner! early exit and pass winning coords
                                 declare_winner(row, column, (row+i), (column-i))
                                 return True
+                            
         return False # default return value
 
-
+    '''
+        called when a drop button is clicked
+        looks through the column for the first EMPTY
+        and disables the button on full column
+        calls check winner
+    '''
     def drop_disc(column):
+        # loops up the chosen column
         for row in range(ROWS):
-            if board[row][column] == 0:
+            # checks if EMPTY
+            if board[row][column] == EMPTY:
+                # assigns it to current player
                 board[row][column] = player
+                # checks if column is full and disables button
                 if row == ROWS-1:
                     buttons[column].config(state=DISABLED)
                 break
+            
+        # checks for winning state otherwise next turn
         if check_winner() == False:
             next_turn()
+
+        # updates the state of the game
         render_game()
 
 
@@ -338,18 +393,20 @@ def pvp_start():
     reset_game()
     pvp_window.mainloop()
 
+'''
+    intial screen of the app
+    only PvP for now
+'''
+# initialise and configure startup screen
+nav_window = Tk()
+nav_window.title("Connect Four Navigation")
+nav_window.geometry("400x650")
+nav_window.configure(background=BACKGROUND)
 
+nav_frame = Frame(nav_window).pack()
 
-navigationMenuWin = Tk()
-navigationMenuWin.title("Connect Four Navigation")
-navigationMenuWin.geometry("400x650")
-navigationMenuWin.configure(background=BACKGROUND)
+# just one button for now
+pvp_button = Button(nav_frame, text="Player VS Player", font=("Arial", 28),command=pvp_start).pack()
 
-frame1 = Frame(navigationMenuWin).pack()
-
-b1 = Button(frame1, text="Player VS Player", font=("Arial", 28),command=pvp_start).pack()
-
-
-
-
-navigationMenuWin.mainloop()
+# starts whole program
+nav_window.mainloop()
